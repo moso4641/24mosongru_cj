@@ -1,0 +1,25 @@
+import pandas as pd
+import numpy as np
+
+def clean_data():
+    # 1. 读取原始数据
+    df = pd.read_csv('douban_top250_raw.csv', encoding='utf-8-sig')
+    print(f"原始数据形状: {df.shape}")
+    
+    # 2. 数据清洗
+    # (1) 去重
+    df = df.drop_duplicates(subset=['标题', '链接'])
+    
+    # (2) 处理空值
+    df['短评'] = df['短评'].fillna('无短评')
+    df['评价人数'] = pd.to_numeric(df['评价人数'], errors='coerce').fillna(0)
+    df['评分'] = pd.to_numeric(df['评分'], errors='coerce')
+    
+    # (3) 异常值处理：评分应在0-10之间
+    df = df[(df['评分'] >= 0) & (df['评分'] <= 10)]
+    
+    # 3. 保存清洗后数据
+    df.to_csv('douban_top250_cleaned.csv', index=False, encoding='utf-8-sig')
+    print(f"清洗后数据形状: {df.shape}")
+    print("数据清洗完成！")
+    return df
